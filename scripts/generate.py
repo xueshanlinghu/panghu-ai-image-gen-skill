@@ -18,7 +18,8 @@ from pathlib import Path
 SKILL_DIR = Path(__file__).parent.parent
 load_dotenv(SKILL_DIR / ".env")
 
-API_URL = "https://api.acedata.cloud/openai/images/generations"
+API_URL_GENERATE = "https://api.acedata.cloud/openai/images/generations"
+API_URL_EDIT = "https://api.acedata.cloud/openai/images/edits"
 API_KEY = os.getenv("PANGHU_API_KEY")
 OUTPUT_DIR = SKILL_DIR / "生成结果"
 
@@ -74,25 +75,36 @@ def main():
         if not image_path.exists():
             print(f"❌ 错误：输入图片不存在：{args.image}")
             return 1
+        # 自动识别输入图片MIME类型
+        suffix = image_path.suffix.lower()
+        mime_map = {
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".png": "image/png",
+            ".webp": "image/webp"
+        }
+        mime_type = mime_map.get(suffix, "image/jpeg")
         # 构造multipart文件上传
         files = {
-            "image": (image_path.name, open(image_path, "rb"), f"image/{args.output_format if args.output_format != 'jpg' else 'jpeg'}")
+            "image": (image_path.name, open(image_path, "rb"), mime_type)
         }
         print("🖼️  图生图模式：已加载输入图片")
     
     print(f"🎨 正在生成图片...")
     print(f"📝 提示词：{args.prompt[:100]}{'...' if len(args.prompt) > 100 else ''}")
     print(f"📐 尺寸：{args.size} | 质量：{args.quality} | 格式：{args.output_format}")
-    print("⏳ 请稍候，高清/4K图片生成可能需要30-120秒...")
+    print("⏳ 请稍候，高清/4K图片生成可能需要1-5分钟，请耐心等待不要中断...")
     
     try:
         if files:
-            # 图生图用multipart/form-data
-            response = requests.post(API_URL, headers=headers, data=data, files=files, timeout=180)
+            # 图生图/图片编辑请求edits端点，使用multipart/form-data
+            request_url = API_URL_EDIT
+            response = requests.post(request_url, headers=headers, data=data, files=files, timeout=1800)
         else:
-            # 文生图用application/json
+            # 文生图请求generations端点，使用application/json
+            request_url = API_URL_GENERATE
             headers["content-type"] = "application/json"
-            response = requests.post(API_URL, headers=headers, json=data, timeout=180)
+            response = requests.post(request_url, headers=headers, json=data, timeout=1800)
         
         response.raise_for_status()
         result = response.json()
@@ -131,7 +143,7 @@ def main():
             
             save_path.parent.mkdir(parents=True, exist_ok=True)
             print(f"\n💾 正在保存图片到 {save_path}...")
-            img_response = requests.get(image_url, timeout=60)
+            img_response = requests.get(image_url, timeout=300)
             img_response.raise_for_status()
             with open(save_path, "wb") as f:
                 f.write(img_response.content)
