@@ -1,7 +1,7 @@
 ---
 name: panghu-ai-image-gen
 description: "当用户需要生成图片、AI画图、文生图、图生图、改图时使用，基于胖狐AI gpt-image-2模型，最高支持4K高清分辨率，面向小白用户友好交互。"
-version: 1.2.0
+version: 1.3.0
 author: 雪山凌狐
 license: MIT
 metadata:
@@ -83,7 +83,7 @@ metadata:
 | 图生图 | --image [用户上传图片的本地路径] |
 
 ### 默认配置（用户没说就用这个）
-`--quality high`（最高清）、`--size "3840x2160"`（4K横屏）、`--output_format png`、自动保存到`./生成结果/`目录下。
+`--quality high`（最高清）、`--size "3840x2160"`（4K横屏）、`--output_format png`，**默认自动保存到`./生成结果/`目录下**，文件名自动用「提示词简写+时间戳」命名，不需要手动加`--save`参数，除非用户指定了自定义保存路径。透明背景会自动切换为png格式，避免透明通道失效。
 
 ---
 
