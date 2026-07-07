@@ -41,10 +41,10 @@
    ```bash
    cd panghu-ai-image-gen-skill
    pip install requests python-dotenv
-   # 或使用uv
+   # 或使用uv（优先使用 uv）
    uv pip install requests python-dotenv
    ```
-5. 重启Hermes Agent，技能会自动加载。
+5. 重启Hermes Agent，技能会自动加载。（不重启也能用）
 
 ## 📝 使用方法
 安装完成后，你只需要用自然语言和Hermes说你要生成图片就可以了，比如：
@@ -97,7 +97,6 @@ panghu-ai-image-gen-skill/
 MIT License © 2026 雪山凌狐
 
 ## 💡 注意事项
-1. 使用前需要先在胖狐AI平台注册账号并充值积分，生成一张图片约消耗0.11积分（4K高清）
-2. 4K高清图片生成约需60-120秒，请耐心等待，不要中断请求
-3. 透明背景仅支持PNG/WebP格式，JPG不支持透明通道
-4. 自定义尺寸宽高必须是16的倍数，总像素不超过830万，最长边不超过3840px
+1. 4K高清图片生成约需60-120秒，请耐心等待，不要中断请求
+2. 透明背景仅支持PNG/WebP格式，JPG不支持透明通道
+3. 自定义尺寸宽高必须是16的倍数，总像素不超过830万，最长边不超过3840px
