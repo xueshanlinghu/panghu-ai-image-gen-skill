@@ -1,0 +1,36 @@
+name: Release v1.3.3
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/release-v1.3.3.yml
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create v1.3.3 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > /tmp/release-notes.md <<'EOF'
+          ## 🔄 接口更新
+          - 文生图底层 API 切换至胖狐中转新接口地址 `/openai/images/generations`
+          - 图生图/改图底层 API 切换至胖狐中转新接口地址 `/openai/images/edits`
+          - 同步更新接口参考文档，移除旧 `acedata` API 域名引用
+          - 模型保持使用 `gpt-image-2`
+
+          ## 📦 版本更新
+          - `SKILL.md` 版本号更新至 `1.3.3`
+          EOF
+
+          gh release create v1.3.3 \
+            --repo "$GITHUB_REPOSITORY" \
+            --target c49b6428fc739b0f363b33bd695157317ac572a8 \
+            --title "v1.3.3" \
+            --notes-file /tmp/release-notes.md
