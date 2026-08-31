@@ -1,6 +1,6 @@
 # 胖狐AI图片接口 使用注意事项
 ## 端点信息
-- 接口地址：POST `https://api.acedata.cloud/openai/images/generations`
+- 接口地址：POST `https://api.ace.324567.xyz/openai/images/generations`
 - 请求头规则：
   - 文生图：使用 `Content-Type: application/json`，参数以JSON格式提交
   - 图生图：**必须使用** `Content-Type: multipart/form-data`，图片以表单字段`image`上传，其余参数以普通表单字段提交（使用JSON格式提交图生图请求会报错）
@@ -29,9 +29,9 @@
   "success": true,
   "task_id": "任务唯一ID（用于问题排查）",
   "data": [{"url": "图片CDN直链地址"}],
-  "elapsed": 93.5, // 生成耗时（秒）
-  "cost": {"amount": 0.11}, // 消耗积分数量
-  "usage": {"total_tokens": 13513} // 总Token消耗
+  "elapsed": 93.5,
+  "cost": {"amount": 0.11},
+  "usage": {"total_tokens": 13513}
 }
 ```
 ### 错误响应
