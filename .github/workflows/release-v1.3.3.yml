@@ -34,3 +34,5 @@ jobs:
             --target c49b6428fc739b0f363b33bd695157317ac572a8 \
             --title "v1.3.3" \
             --notes-file /tmp/release-notes.md
+
+# Trigger run after workflow exists on master.
