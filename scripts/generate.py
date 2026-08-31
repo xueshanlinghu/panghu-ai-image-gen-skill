@@ -18,8 +18,8 @@ from pathlib import Path
 SKILL_DIR = Path(__file__).parent.parent
 load_dotenv(SKILL_DIR / ".env")
 
-API_URL_GENERATE = "https://api.acedata.cloud/openai/images/generations"
-API_URL_EDIT = "https://api.acedata.cloud/openai/images/edits"
+API_URL_GENERATE = "https://api.ace.324567.xyz/openai/images/generations"
+API_URL_EDIT = "https://api.ace.324567.xyz/openai/images/edits"
 API_KEY = os.getenv("PANGHU_API_KEY")
 OUTPUT_DIR = SKILL_DIR / "生成结果"
 
