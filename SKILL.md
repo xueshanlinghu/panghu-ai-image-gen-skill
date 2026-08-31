@@ -1,7 +1,7 @@
 ---
 name: panghu-ai-image-gen
 description: "当用户需要生成图片、AI画图、文生图、图生图、改图时使用，基于胖狐AI gpt-image-2模型，最高支持4K高清分辨率，面向小白用户友好交互。"
-version: 1.3.2
+version: 1.3.3
 author: 雪山凌狐
 license: MIT
 metadata:
