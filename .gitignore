@@ -1,9 +1,12 @@
-# 敏感信息配置文件（包含API密钥，绝对不要提交）
+# 敏感信息配置文件
 .env
 *.env
 !.env.example
 
-# 生成结果目录（用户生成的图片文件不需要上传）
+# 每个安装实例的模型偏好
+.panghu-image-models.json
+
+# 生成结果目录
 生成结果/
 output/
 results/
