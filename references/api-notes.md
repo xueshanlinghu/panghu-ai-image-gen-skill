@@ -33,7 +33,8 @@
 | `quality` | `auto` / `high` / `medium` / `low` | 默认 high |
 | `background` | `auto` / `transparent` / `opaque` | transparent 需 png/webp |
 | `output_format` | `png` / `jpeg` / `webp` | 默认 png |
-| `image` | 本地图片路径 | 仅图生图，支持 png/jpg/jpeg/webp |
+| `image` | 本地主图路径 | 仅图生图，支持 png/jpg/jpeg/webp |
+| `image-extra` | 本地额外参考图路径，可重复传入 | 仅图生图；每张参考图对应一个 `image[]` multipart 字段 |
 
 ## 本地模型偏好文件
 技能根目录的 `.panghu-image-models.json` 保存长期偏好，例如：
@@ -49,10 +50,18 @@
 该文件属于每个安装实例的本地偏好，不应提交 Git。
 
 ## 请求格式
-文生图使用 JSON；图生图将同一组普通字段放入 multipart/form-data，同时以 `image` 字段上传图片。
+文生图使用 JSON。
+
+图生图使用 multipart/form-data：
+- 主图固定使用字段 `image`。
+- 每张额外参考图重复使用字段 `image[]`。
+- `requests` 侧应使用 list of tuples 构造 `files`，以保留多个同名 `image[]` 字段；不要把多张图片塞进同一个 `image` 键。
+- `--image-extra` 只能配合 `--image` 使用，不能单独触发图生图。
 
 ## 实操注意事项
 1. 生成请求脚本超时 1800 秒；高清任务等待较久时不要提前重复提交。
 2. 输入图片 MIME 必须根据原文件后缀决定，不能按输出格式决定。
 3. 透明背景若指定 jpeg，脚本自动切换为 png。
-4. 返回 CDN 图片链接后，下载超时为 300 秒。
+4. 多图参考更容易让模型重绘整图；局部修改且要求其他内容尽量保持不变时优先单图编辑。
+5. JPG/JPEG 参考图若遇到无具体原因的 `400 bad_request`，可先转换为 PNG 再重试一次。
+6. 返回 CDN 图片链接后，下载超时为 300 秒。
