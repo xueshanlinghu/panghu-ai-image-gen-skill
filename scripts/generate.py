@@ -34,6 +34,13 @@ RECOMMENDED_TEXT_MODEL = "gpt-image-2.5-flare"
 RECOMMENDED_EDIT_MODEL = "gpt-image-2.5-sunburst"
 FIXED_MODERATION = "low"
 
+MIME_TYPES = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".webp": "image/webp",
+}
+
 
 def sanitize_filename(text, max_len=20):
     """从提示词生成安全的文件名，过滤非法字符。"""
@@ -95,7 +102,13 @@ def resolve_model(args):
 def main():
     parser = argparse.ArgumentParser(description="使用胖狐AI生成图片")
     parser.add_argument("--prompt", help="图片描述提示词（最长支持32000字符）")
-    parser.add_argument("--image", help="图生图模式下的输入图片路径")
+    parser.add_argument("--image", help="图生图模式下的主图/底图路径")
+    parser.add_argument(
+        "--image-extra",
+        action="append",
+        default=[],
+        help="图生图模式下的额外参考图路径，可重复传入",
+    )
     parser.add_argument("--model", choices=SUPPORTED_MODELS, help="仅本次生成覆盖默认模型")
     parser.add_argument("--set-text-model", choices=SUPPORTED_MODELS, help="长期设置文生图默认模型")
     parser.add_argument("--set-edit-model", choices=SUPPORTED_MODELS, help="长期设置图生图默认模型")
@@ -126,6 +139,9 @@ def main():
     if not args.prompt:
         parser.error("生成图片时必须提供 --prompt")
 
+    if args.image_extra and not args.image:
+        parser.error("--image-extra 只能在提供 --image 主图时使用")
+
     if not API_KEY:
         print("❌ 错误：.env文件中未配置PANGHU_API_KEY")
         return 1
@@ -153,21 +169,29 @@ def main():
     }
 
     files = None
+    opened_image_files = []
     if args.image:
-        image_path = Path(args.image)
-        if not image_path.exists():
-            print(f"❌ 错误：输入图片不存在：{args.image}")
-            return 1
-        suffix = image_path.suffix.lower()
-        mime_map = {
-            ".jpg": "image/jpeg",
-            ".jpeg": "image/jpeg",
-            ".png": "image/png",
-            ".webp": "image/webp",
-        }
-        mime_type = mime_map.get(suffix, "image/jpeg")
-        files = {"image": (image_path.name, open(image_path, "rb"), mime_type)}
-        print("🖼️  图生图模式：已加载输入图片")
+        image_fields = [("image", Path(args.image))]
+        image_fields.extend(("image[]", Path(path)) for path in args.image_extra)
+
+        for field_name, image_path in image_fields:
+            if not image_path.exists():
+                label = "主图" if field_name == "image" else "额外参考图"
+                print(f"❌ 错误：{label}不存在：{image_path}")
+                return 1
+
+        files = []
+        for field_name, image_path in image_fields:
+            mime_type = MIME_TYPES.get(image_path.suffix.lower(), "image/jpeg")
+            file_handle = open(image_path, "rb")
+            opened_image_files.append(file_handle)
+            files.append((field_name, (image_path.name, file_handle, mime_type)))
+
+        extra_count = len(args.image_extra)
+        if extra_count:
+            print(f"🖼️  图生图模式：已加载主图 + {extra_count} 张额外参考图")
+        else:
+            print("🖼️  图生图模式：已加载主图")
 
     print("🎨 正在生成图片...")
     print(f"🤖 模型：{selected_model}（{model_source}）")
@@ -229,8 +253,8 @@ def main():
             print(f"返回内容：{e.response.text[:500]}")
         return 1
     finally:
-        if files and "image" in files:
-            files["image"][1].close()
+        for file_handle in opened_image_files:
+            file_handle.close()
 
 
 if __name__ == "__main__":
